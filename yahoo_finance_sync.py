@@ -3,13 +3,13 @@ from bs4 import BeautifulSoup
 import json
 from datetime import datetime
 
-def extract_article_details(url, headers):
+def extract_article_details(url: str, headers: str) -> list  :
     try:
         response = requests.get(url, headers=headers)
         soup = BeautifulSoup(response.text, 'html.parser')
 
         # Title extraction
-        title = soup.find('h1', class_='cover-title yf-1o1tx8g')
+        title = soup.find('div', class_='cover-title yf-1at0uqp')
         title_text = title.text.strip() if title else "No title found"
 
         # Content extraction
@@ -30,9 +30,11 @@ def extract_article_details(url, headers):
         print(f"Error extracting details from {url}: {e}")
         return None
 
-def scrape_yahoo_finance_news(stock):
+def scrape_yahoo_finance_news(stock:str)->list:
     # Use the news-specific URL
     url = f"https://finance.yahoo.com/quote/{stock}/news/"
+
+    # Optional
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
     }
@@ -51,7 +53,8 @@ def scrape_yahoo_finance_news(stock):
 
     # Extract details for each article
     articles = []
-    for article_url in article_urls[:10]:  # Limit to first 10 articles
+    # Limit to first 10 articles
+    for article_url in article_urls[:10]:
         article_details = extract_article_details(article_url, headers)
         if article_details:
             articles.append(article_details)
@@ -64,55 +67,11 @@ def scrape_yahoo_finance_news(stock):
     print(f"Saved {len(articles)} articles to {filename}")
     json_string = json.dumps(articles)
 
+    print(json_string)
+    
     return json_string
 
 # Run the scraper
 if __name__ == "__main__":
     stock = "NVDA"
     articles = scrape_yahoo_finance_news(stock)
-    '''
-    # Optional: Print articles to console
-    for article in articles:
-        print("\n--- Article ---")
-        print(f"Title: {article['title']}")
-        print(f"URL: {article['url']}")
-        print(f"Timestamp: {article['timestamp']}")
-        print("Content Preview:", article['content'][:1] if article['content'] else "No content")
-    '''
-
-
-# test script
-'''
-
-headers = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-}
-
-url = "https://finance.yahoo.com/video/jensen-huang-sets-nvidia-apart-220744099.html"
-
-try:
-    response = requests.get(url, headers=headers)
-    print(f"Status Code: {response.status_code}")
-    print(f"Actual URL: {response.url}")
-    
-    # Check content type
-    content_type = response.headers.get('Content-Type', '')
-    print(f"Content Type: {content_type}")
-    
-    # Try parsing with BeautifulSoup
-    soup = BeautifulSoup(response.text, 'html.parser')
-    
-    # Try to find titles or main content
-    titles = soup.find_all(['h1', 'h2', 'title'])
-    print("\nFound Titles:")
-    for title in titles:
-        print(title.text.strip())
-    bodys = soup.find_all('p', class_='yf-1pe5jgt')
-    print("\nFound Body:")
-    for body in bodys:
-        print(body.text.strip())
-    
-
-except requests.exceptions.RequestException as e:
-    print(f"Error fetching the page: {e}")
-'''

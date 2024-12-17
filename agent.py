@@ -1,17 +1,19 @@
+# 1. Imports and Configuration
 from ollama import chat
 from ollama import ChatResponse
-import requests
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 import matplotlib.dates as mdates
 from yahoo_finance_sync import *
-from dotenv import load_dotenv
 import os
 import json
+from dotenv import load_dotenv
 
 load_dotenv()
 OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")
 ALPHA_VANTAGE_API_KEY = os.getenv("ALPHA_VANTAGE_API_KEY")
+
+# 2. Function
 def stock_news(stock):
     """
     Summarize news articles for a given stock symbol.
@@ -64,26 +66,7 @@ def stock_news(stock):
         print(error_message)  # Log the error
         return error_message
 
-def web_crawler(url):
-    url = "https://finance.yahoo.com/news/bitcoin-hits-100-000-highly-025306428.html"
-    response = requests.get(url)
-    soup = BeautifulSoup(response.content, 'html.parser')
-
-    # Extract article title
-    title = soup.find('h1', class_='caas-title-wrapper').text.strip()
-
-    # Extract article content
-    content = soup.find('div', class_='caas-body')
-    paragraphs = content.find_all('p')
-    article_text = '\n'.join([p.text for p in paragraphs])
-
-    # Print extracted information
-    print(f"Title: {title}")
-    print("\nContent:")
-    print(article_text)
-    return 
-
-def get_time_series_daily(symbol: str, api_key: str) -> dict:
+def get_time_series_daily(symbol, api_key):
     """
     Fetch daily time series stock data for a given symbol using Alpha Vantage API.
 
@@ -108,7 +91,7 @@ def get_time_series_daily(symbol: str, api_key: str) -> dict:
     except requests.exceptions.RequestException as e:
         return {"error": str(e)}
 
-def get_time_series_daily_and_plot(symbol: str, api_key: str) -> str:
+def get_time_series_daily_and_plot(symbol, api_key) :
     base_url = "https://www.alphavantage.co/query"
     params = {
         "function": "TIME_SERIES_DAILY",
@@ -203,21 +186,6 @@ stock_news_tool = {
     },
 }
 
-get_weather_tool = {
-    'type': 'function',
-    'function': {
-        'name': 'get_weather',
-        'description': 'Fetch the current weather of a specific location.',
-        'parameters': {
-            'type': 'object',
-            'required': ['location'],
-            'properties': {
-                'location': {'type': 'string', 'description': 'The name of the location (e.g., New York).'},
-            },
-        },
-    },
-}
-
 get_time_series_daily_tool = {
     'type': 'function',
     'function': {
@@ -247,6 +215,23 @@ get_time_series_daily_and_plot_tool = {
         },
     },
 }
+
+get_weather_tool = {
+    'type': 'function',
+    'function': {
+        'name': 'get_weather',
+        'description': 'Fetch the current weather of a specific location.',
+        'parameters': {
+            'type': 'object',
+            'required': ['location'],
+            'properties': {
+                'location': {'type': 'string', 'description': 'The name of the location (e.g., New York).'},
+            },
+        },
+    },
+}
+
+# 3. Tool Definition and Selection
 
 def determine_tool_necessity(prompt):
     """
@@ -300,6 +285,8 @@ def is_tool_necessary(tool_name, arguments, prompt):
         return any(keyword in prompt_lower for keyword in ['stock', 'price', 'market', 'news'])
     
     return False
+
+# 4. Main Execution Flow
 
 def main():
     # System Prompt with clear guidelines
