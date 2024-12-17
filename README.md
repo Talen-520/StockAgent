@@ -44,7 +44,6 @@ source venv/bin/activate
 
 #### Option A: Manual Installation
 ```bash
-pip install -U pip
 pip install matplotlib beautifulsoup4 requests ollama python-dotenv
 ```
 
