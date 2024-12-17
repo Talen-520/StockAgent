@@ -1,28 +1,27 @@
-# StockAgent 📈🤖
+# StockAgent 
 
 ## Overview
 StockAgent is an intelligent AI-powered tool that provides real-time stock market insights, news summaries, and data analysis. Leveraging advanced AI and multiple financial APIs, it helps users quickly understand market trends and company news.
 
-## Features 🌟
+## Features 
 - Real-time stock news summarization
 - Daily stock price tracking
 - Weather information retrieval
 - AI-powered intelligent information processing
 - Flexible tool selection based on user queries
 
-## Prerequisites 🛠️
+## Prerequisites 
 
 ### System Requirements
 - Python 3.8+
 - Pip package manager
-- Internet connection
 
 ### Tools and Platforms
 - [Ollama](https://ollama.com/) - Local AI model runner
 - Alpha Vantage API (for stock data)
 - OpenWeatherMap API (for weather information)
 
-## Installation 📦
+## Installation 
 
 ### 1. Clone the Repository
 ```bash
@@ -69,12 +68,12 @@ OPENWEATHER_API_KEY=your_openweather_key
 ollama pull llama3
 ```
 
-## Usage 🚀
+## Usage 
 ```bash
 python agent.py
 ```
 
-## Example Queries 💬
+## Example Queries 
 - "What's the latest news for NVDA?"
 - "Show me Apple stock prices for the last year"
 - "What's the weather in New York?"
