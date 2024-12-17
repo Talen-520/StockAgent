@@ -25,7 +25,7 @@ StockAgent is an intelligent AI-powered tool that provides real-time stock marke
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/yourusername/StockAgent.git
+git clone https://github.com/Talen-520/StockAgent.git
 cd StockAgent
 ```
 
