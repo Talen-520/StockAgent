@@ -52,7 +52,7 @@ pip install matplotlib beautifulsoup4 requests ollama python-dotenv
 pip install -r requirements.txt
 ```
 
-### 4. API Key Configuration
+### 4. API Key Configuration [optional]
 1. Create a `.env` file in the project root
 2. Add your API keys:
 ```
@@ -77,28 +77,10 @@ python agent.py
 - "Show me Apple stock prices for the last year"
 - "What's the weather in New York?"
 
-## Project Structure 📂
-```
-StockAgent/
-│
-├── agent.py          # Main application script
-├── yahoo_finance_sync.py  # Web scraping module
-├── .env              # API keys (git-ignored)
-├── requirements.txt  # Project dependencies
-└── README.md         # Project documentation
-```
-
 ## API References 🌐
 - [Alpha Vantage API](https://www.alphavantage.co/documentation/)
 - [OpenWeatherMap API](https://openweathermap.org/api)
 - [Ollama Documentation](https://github.com/ollama/ollama)
-
-## Contributing 🤝
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
 
 ## Disclaimer ⚖️
 This tool is for learning purposes only. AI could make misleading information, Always conduct your own research before making financial decisions.
