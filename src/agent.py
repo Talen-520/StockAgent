@@ -4,10 +4,10 @@ from ollama import ChatResponse
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 import matplotlib.dates as mdates
-from yahoo_finance_sync import *
 import os
 import json
 from dotenv import load_dotenv
+from tools import scrape_yahoo_finance_news
 
 load_dotenv()
 OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")

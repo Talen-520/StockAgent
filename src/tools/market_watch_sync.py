@@ -30,7 +30,7 @@ def extract_article_details(url, headers):
         print(f"Error extracting details from {url}: {e}")
         return None
 
-def market_watch_news(stock):
+def scrape_market_watch_news(stock):
     # Use the news-specific URL
     url = f"https://www.marketwatch.com/investing/stock/{stock}?mod=search_symbol"
 
