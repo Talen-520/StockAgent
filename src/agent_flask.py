@@ -1,7 +1,7 @@
 from flask import Flask, jsonify
 from ollama import chat
 from ollama import ChatResponse
-from src.tools.yahoo_finance_sync import scrape_yahoo_finance_news
+from tools import scrape_yahoo_finance_news
 import os
 
 app = Flask(__name__)

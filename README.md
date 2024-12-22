@@ -72,7 +72,10 @@ ollama pull llama3
 python src/agent.
 python src/agent_flask.py
 ```
-
+## Flask API EndPoint
+```bash
+http://127.0.0.1:5000/stock/{symbol}
+```
 ## Example Queries 
 - "What's the latest news for NVDA?"
 - "Show me Apple stock prices for the last year"
