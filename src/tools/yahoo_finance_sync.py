@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import json
 from datetime import datetime
-
+import os
 def extract_article_details(url: str, headers: str) -> list  :
     try:
         response = requests.get(url, headers=headers)
@@ -60,8 +60,13 @@ def scrape_yahoo_finance_news(stock:str)->list:
             articles.append(article_details)
 
     # Save to JSON file
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    data_dir = os.path.join(os.path.dirname(current_dir), 'data')
+    os.makedirs(data_dir, exist_ok=True)
     filename = f"{stock}_news_articles.json"
-    with open(filename, 'w', encoding='utf-8') as f:
+    filepath = os.path.join(data_dir, filename)
+
+    with open(filepath, 'w', encoding='utf-8') as f:
         json.dump(articles, f, ensure_ascii=False, indent=2)
 
     print(f"Saved {len(articles)} articles to {filename}")
