@@ -4,6 +4,8 @@
 StockAgent is an intelligent AI-powered tool that provides real-time stock market insights, news summaries, and data analysis. Leveraging advanced AI and multiple financial APIs, it helps users quickly understand market trends and company news.
 
 ## Features 
+- Protect your data privacy, all information is processed locally
+- Save time and effort by grabbing 10 finance news at once
 - Real-time stock news summarization
 - Daily stock price tracking
 - Weather information retrieval
