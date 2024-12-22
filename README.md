@@ -69,7 +69,8 @@ ollama pull llama3
 
 ## Usage 
 ```bash
-python agent.py
+python src/agent.
+python src/agent_flask.py
 ```
 
 ## Example Queries 
