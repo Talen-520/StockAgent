@@ -10,12 +10,6 @@ StockAgent is an intelligent AI-powered tool that provides real-time stock marke
 - AI-powered intelligent information processing
 - Flexible tool selection based on user queries
 
-## Prerequisites 
-
-### System Requirements
-- Python 3.8+
-- Pip package manager
-
 ### Tools and Platforms
 - [Ollama](https://ollama.com/) - Local AI model runner
 - Alpha Vantage API (for stock data)
@@ -62,9 +56,9 @@ OPENWEATHER_API_KEY=your_openweather_key
 
 ### 5. Install Ollama
 - Download and install from [Ollama's official website](https://ollama.com/)
-- Pull Llama3 model:
+- Pull model like Llama3.2 model:
 ```bash
-ollama pull llama3
+ollama pull llama3.2
 ```
 
 ## Usage 
@@ -77,14 +71,17 @@ python src/agent_flask.py
 http://127.0.0.1:5000/stock/{symbol}
 ```
 ## Example Queries 
+- tools
+- exit
+- clear
 - "What's the latest news for NVDA?"
 - "Show me Apple stock prices for the last year"
 - "What's the weather in New York?"
 
-## API References 🌐
+## API References 
 - [Alpha Vantage API](https://www.alphavantage.co/documentation/)
 - [OpenWeatherMap API](https://openweathermap.org/api)
 - [Ollama Documentation](https://github.com/ollama/ollama)
 
-## Disclaimer ⚖️
+## Disclaimer 
 This tool is for learning purposes only. AI could make misleading information, Always conduct your own research before making financial decisions.

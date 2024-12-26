@@ -1,4 +1,3 @@
-# 1. Imports and Configuration
 from ollama import chat
 from ollama import ChatResponse
 import matplotlib.pyplot as plt
@@ -25,9 +24,7 @@ def stock_news(stock):
         str: Summarized news articles or an error message.
     """
     try:
-        # Attempt to scrape and save news articles
         articles = scrape_yahoo_finance_news(stock)
-        # Prepare a structured summary prompt
         summary_prompt = f"""
         Analyze and summarize the following news articles (max 10) for {stock} with following, each articles includes title, content, url and timestamp, here is articles:
 
@@ -42,7 +39,7 @@ def stock_news(stock):
         
         """
         
-        # Use Ollama to generate a summary
+        # Use Ollama to generate a summary, we call the model and provide the summary prompt again as the user input
         response: ChatResponse = chat(
             'llama3.2',  
             messages=[
@@ -61,9 +58,8 @@ def stock_news(stock):
         return response['message']['content']
 
     except Exception as e:
-        # Comprehensive error handling
         error_message = f"Error retrieving or summarizing news for {stock}: {str(e)}"
-        print(error_message)  # Log the error
+        print(error_message) 
         return error_message
 
 def get_time_series_daily(symbol, api_key):
@@ -230,106 +226,102 @@ get_weather_tool = {
         },
     },
 }
+class ConversationalAssistant:
+    def __init__(self):
+        self.conversation_history = []
+        self.system_prompt = """
+        You are an AI assistant specializing in information retrieval and analysis. When responding to queries:
 
-# 3. Tool Definition and Selection
+        1. Carefully analyze the user's question to determine if external data is absolutely required.
+        2. Do NOT call tools by default. Only invoke tools when:
+           - The query specifically requests real-time or current information
+           - Direct data retrieval is the most efficient way to answer the question
+           - The information cannot be answered from your existing knowledge
+        3. If a tool can help but isn't strictly necessary, first attempt to answer using your existing knowledge.
+        4. When using tools, be selective and use only the most relevant tool for the specific information needed.
+        5. Maintain conversation context and refer back to previous discussions when relevant.
+        6. Be engaging and conversational while remaining professional and informative.
 
-def determine_tool_necessity(prompt):
-    """
-    Analyze the prompt to decide if tools are necessary.
-    Returns a list of relevant tools or an empty list.
-    """
-    prompt_lower = prompt.lower()
-    
-    # Weather-specific queries
-    if any(weather_keyword in prompt_lower for weather_keyword in ['weather', 'temperature', 'forecast']):
-        return [get_weather_tool]
-    
-    # Stock-specific queries
-    if any(stock_keyword in prompt_lower for stock_keyword in ['stock', 'price', 'market', 'share', 'trade', 'news']):
-        return [stock_news_tool, get_time_series_daily_tool, get_time_series_daily_and_plot_tool]
-    
-    return []  # Default: no tools
+        Your primary goal is to provide accurate, helpful responses while maintaining a natural conversation flow.
+        """
 
-def select_most_relevant_tool(tools, prompt):
-    """
-    Intelligently select the most relevant tool based on the prompt.
-    """
-    prompt_lower = prompt.lower()
-    
-    tool_priority = {
-        'get_weather': ['weather', 'temperature', 'forecast'],
-        'stock_news': ['news', 'article', 'story'],
-        'get_time_series_daily_and_plot': ['graph', 'plot', 'chart', 'visualization'],
-        'get_time_series_daily': ['price', 'stock', 'value', 'market']
-    }
-    
-    for tool_name, keywords in tool_priority.items():
-        if any(keyword in prompt_lower for keyword in keywords):
-            return [next(tool for tool in tools if tool['function']['name'] == tool_name)]
-    
-    return tools  # Return all tools if no specific match
+    def determine_tool_necessity(self, prompt):
+        prompt_lower = prompt.lower()
+        
+        tools = []
+        if any(weather_keyword in prompt_lower for weather_keyword in ['weather', 'temperature', 'forecast']):
+            tools.append(get_weather_tool)
+        
+        if any(stock_keyword in prompt_lower for stock_keyword in ['stock', 'price', 'market', 'share', 'trade', 'news']):
+            tools.extend([stock_news_tool, get_time_series_daily_tool, get_time_series_daily_and_plot_tool])
+        
+        return tools
 
-def is_tool_necessary(tool_name, arguments, prompt):
-    """
-    Determine if a tool is truly necessary based on the prompt and arguments.
-    This provides an additional layer of filtering.
-    """
-    prompt_lower = prompt.lower()
-    
-    # Weather tool specifics
-    if tool_name == 'get_weather':
-        return 'weather' in prompt_lower or 'temperature' in prompt_lower
-    
-    # Stock tools specifics
-    if tool_name in ['stock_news', 'get_time_series_daily', 'get_time_series_daily_and_plot']:
-        return any(keyword in prompt_lower for keyword in ['stock', 'price', 'market', 'news'])
-    
-    return False
+    def select_most_relevant_tool(self, tools, prompt):
+        prompt_lower = prompt.lower()
+        tool_priority = {
+            'get_weather': ['weather', 'temperature', 'forecast'],
+            'stock_news': ['news', 'article', 'story'],
+            'get_time_series_daily_and_plot': ['graph', 'plot', 'chart', 'visualization'],
+            'get_time_series_daily': ['price', 'stock', 'value', 'market']
+        }
+        
+        for tool_name, keywords in tool_priority.items():
+            if any(keyword in prompt_lower for keyword in keywords):
+                return [next(tool for tool in tools if tool['function']['name'] == tool_name)]
+        
+        return tools
 
-# 4. Main Execution Flow
+    def process_user_input(self, user_input):
+        # Add user input to conversation history
+        self.conversation_history.append({'role': 'user', 'content': user_input})
+        
+        # Determine necessary tools
+        necessary_tools = self.determine_tool_necessity(user_input)
+        if necessary_tools:
+            necessary_tools = self.select_most_relevant_tool(necessary_tools, user_input)
 
-def main():
-    # System Prompt with clear guidelines
-    SYSTEM_PROMPT = """
-    You are an AI assistant specializing in information retrieval and analysis. When responding to queries:
+        try:
+            # Get response from LLM
+            messages = [{'role': 'system', 'content': self.system_prompt}] + self.conversation_history
+            
+            response = chat(
+                'llama3.2',
+                messages=messages,
+                tools=necessary_tools if necessary_tools else None
+            )
 
-    1. Carefully analyze the user's question to determine if external data is absolutely required.
-    2. Do NOT call tools by default. Only invoke tools when:
-       - The query specifically requests real-time or current information
-       - Direct data retrieval is the most efficient way to answer the question
-       - The information cannot be answered from your existing knowledge
-    3. If a tool can help but isn't strictly necessary, first attempt to answer using your existing knowledge.
-    4. When using tools, be selective and use only the most relevant tool for the specific information needed.
-    5. Explain your reasoning for using a tool before invoking it.
+            # Extract the response content
+            if isinstance(response, dict) and 'message' in response:
+                message_content = response['message'].get('content', '')
+                tool_calls = response['message'].get('tool_calls', [])
+            else:
+                message_content = response.message.content
+                tool_calls = getattr(response.message, 'tool_calls', [])
 
-    Your primary goal is to provide accurate, helpful responses with minimal unnecessary external data retrieval.
-    """
+            # Process tool calls if any
+            if tool_calls:
+                tool_results = self.handle_tool_calls(tool_calls, user_input)
+                # Add tool results to conversation for context
+                full_response = f"Tool Results: {tool_results}\n\n{message_content}"
+                self.conversation_history.append({
+                    'role': 'assistant',
+                    'content': full_response
+                })
+                return full_response
+            else:
+                self.conversation_history.append({
+                    'role': 'assistant',
+                    'content': message_content
+                })
+                return message_content
 
-    # Get user input
-    PROMPT = input("Enter your question here: ")
+        except Exception as e:
+            error_message = f"Error processing response: {str(e)}"
+            print(error_message)
+            return error_message
 
-    # Determine necessary tools
-    necessary_tools = determine_tool_necessity(PROMPT)
-
-    # More intelligent tool selection
-    if necessary_tools:
-        necessary_tools = select_most_relevant_tool(necessary_tools, PROMPT)
-
-    # Chat with intent detection and conditional tool passing
-    response: ChatResponse = chat(
-        'llama3.2',
-        messages=[
-            {
-                'role': 'system',
-                'content': SYSTEM_PROMPT,
-            },
-            {'role': 'user', 'content': PROMPT},
-        ],
-        tools=necessary_tools if necessary_tools else None  # Only pass tools if needed
-    )
-
-    # Process response
-    if response.message.tool_calls:
+    def handle_tool_calls(self, tool_calls, prompt):
         available_functions = {
             'stock_news': lambda stock: stock_news(stock),
             'get_weather': lambda location: get_weather(location, OPENWEATHER_API_KEY),
@@ -337,19 +329,48 @@ def main():
             'get_time_series_daily_and_plot': lambda symbol: get_time_series_daily_and_plot(symbol, ALPHA_VANTAGE_API_KEY),
         }
 
-        for tool in response.message.tool_calls:
-            # Additional check: Confirm tool is truly necessary
-            if is_tool_necessary(tool.function.name, tool.function.arguments, PROMPT):
-                function_to_call = available_functions.get(tool.function.name)
-                if function_to_call:
-                    print(f'Conditionally calling function: {tool.function.name}')
-                    print('Arguments:', tool.function.arguments)
+        results = []
+        for tool in tool_calls:
+            function_to_call = available_functions.get(tool.function.name)
+            if function_to_call:
+                try:
                     result = function_to_call(**tool.function.arguments)
-                    print('Function output:', result)
-            else:
-                print(f'Skipped unnecessary tool: {tool.function.name}')
-    else:  # General response
-        print('Response:', response.message.content)
+                    results.append(f"{tool.function.name} result: {result}")
+                except Exception as e:
+                    results.append(f"Error in {tool.function.name}: {str(e)}")
+
+        return "\n".join(results)
+
+    def clear_conversation(self):
+        """Clear the conversation history"""
+        self.conversation_history = []
+        return "Conversation history cleared."
+
+def main():
+    assistant = ConversationalAssistant()
+    print("Hello! I'm your Stock Agent. How can I help you today? (Type 'exit/quit' to end the conversation or 'clear' to start fresh or 'tools' to see available tools)")
+    
+    while True:
+        user_input = input("\nYou: ").strip()
+        
+        if user_input.lower() == 'exit' or user_input.lower() == 'quit' or user_input.lower() == 'q' or user_input.lower() == 'bye':
+            print("\nAssistant: quitting the conversation.")
+            break
+        elif user_input.lower() == 'clear' or user_input.lower() == 'reset':
+            print("\nAssistant:", assistant.clear_conversation())
+            continue
+        elif user_input == '':
+            continue
+        elif user_input == 'tools':
+            print("\nAvailable Tools:", [tool['function']['name'] for tool in [stock_news_tool, get_time_series_daily_tool, get_time_series_daily_and_plot_tool, get_weather_tool]])
+            continue
+            
+        try:
+            response = assistant.process_user_input(user_input)
+            print("\nAssistant:", response)
+        except Exception as e:
+            print(f"\nAn error occurred: {str(e)}")
+            print("Please try again.")
 
 if __name__ == "__main__":
     main()
