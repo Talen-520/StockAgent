@@ -4,11 +4,12 @@
 StockAgent is an intelligent AI-powered tool that provides real-time stock market insights, news summaries, and data analysis. Leveraging advanced AI and multiple financial APIs, it helps users quickly understand market trends and company news.
 
 ## Features 
-- Protect your data privacy, all information is processed locally
-- Save time and effort by grabbing 10 finance news at once
-- Real-time stock news summarization
-- AI-powered intelligent information processing
-- Flexible tool selection based on user queries
+- **Web UI**: Built with Streamlit for easy access.
+- **Data Privacy**: All information is processed locally to protect your data.
+- **Efficiency**: Grab 10 finance news articles at once to save time and effort.
+- **Real-Time Summarization**: Get concise summaries of the latest stock news.
+- **AI-Powered Processing**: Intelligent information processing for accurate insights.
+- **Flexible Tools**: Select tools based on user queries for a tailored experience.
 
 ### Tools and Platforms
 - [Ollama](https://ollama.com/) - Local AI model runner
@@ -23,23 +24,29 @@ git clone https://github.com/Talen-520/StockAgent.git
 cd StockAgent
 ```
 
-### 2. Create Virtual Environment
+### 2. Create Virtual Environment And Install Dependencies
+#### windows
+
 ```bash
-# Windows
 python -m venv venv
 .\venv\Scripts\activate
-
-# macOS/Linux
+pip install -r requirements.txt
+```
+#### macOS/Linux
+```bash
 python3 -m venv venv
 source venv/bin/activate
-```
-
-### 3. Install Dependencies
-```bash
 pip install -r requirements.txt
 ```
 
-### 4. API Key Configuration [optional]
+### 3. Install Ollama
+- Download and install from [Ollama's official website](https://ollama.com/)
+- Pull model like Llama3.2 model:
+```bash
+ollama pull llama3.2
+```
+
+### API Key Configuration [optional]
 1. Create a `.env` file in the project root
 2. Add your API keys:
 ```
@@ -47,19 +54,13 @@ ALPHA_VANTAGE_API_KEY=your_alpha_vantage_key
 OPENWEATHER_API_KEY=your_openweather_key
 ```
 
-### 5. Install Ollama
-- Download and install from [Ollama's official website](https://ollama.com/)
-- Pull model like Llama3.2 model:
-```bash
-ollama pull llama3.2
-```
 
 ## Usage 
+Web UI
 ```bash
-python src/agent.
-python src/agent_flask.py
-streamlit run .\src\web.py
+streamlit run .\src\webUI.py
 ```
+
 ## Flask API EndPoint
 ```bash
 http://127.0.0.1:5000/stock/{symbol}
