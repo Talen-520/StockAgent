@@ -30,7 +30,7 @@ def extract_article_details(url: str, headers: str) -> list  :
         print(f"Error extracting details from {url}: {e}")
         return None
 
-def scrape_yahoo_finance_news(stock:str)->list:
+def scrape_yahoo_finance_news(stock: str) -> list:
     # Use the news-specific URL
     url = f"https://finance.yahoo.com/quote/{stock}/news/"
 
@@ -51,7 +51,6 @@ def scrape_yahoo_finance_news(stock:str)->list:
         if link.find('a') and link.find('a').has_attr('href') and link.find('a')['href'].startswith('https://finance.yahoo.com/')
     ]
 
-    # Extract details for each article
     articles = []
     # Limit to first 10 articles
     for article_url in article_urls[:10]:
@@ -70,11 +69,8 @@ def scrape_yahoo_finance_news(stock:str)->list:
         json.dump(articles, f, ensure_ascii=False, indent=2)
 
     print(f"Saved {len(articles)} articles to {filename}")
-    json_string = json.dumps(articles)
-
-    print(json_string)
     
-    return json_string
+    return articles  # Return the list directly
 
 # Run the scraper
 if __name__ == "__main__":

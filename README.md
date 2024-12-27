@@ -35,13 +35,6 @@ source venv/bin/activate
 ```
 
 ### 3. Install Dependencies
-
-#### Option A: Manual Installation
-```bash
-pip install matplotlib beautifulsoup4 requests ollama python-dotenv
-```
-
-#### Option B: Using requirements.txt
 ```bash
 pip install -r requirements.txt
 ```
@@ -65,6 +58,7 @@ ollama pull llama3.2
 ```bash
 python src/agent.
 python src/agent_flask.py
+streamlit run .\src\web.py
 ```
 ## Flask API EndPoint
 ```bash

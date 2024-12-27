@@ -249,21 +249,23 @@ class ConversationalAssistant:
         prompt_lower = prompt.lower()
         
         tools = []
-        if any(weather_keyword in prompt_lower for weather_keyword in ['weather', 'temperature', 'forecast']):
-            tools.append(get_weather_tool)
-        
         if any(stock_keyword in prompt_lower for stock_keyword in ['stock', 'price', 'market', 'share', 'trade', 'news']):
-            tools.extend([stock_news_tool, get_time_series_daily_tool, get_time_series_daily_and_plot_tool])
+            tools.append(stock_news_tool) 
+        # if any(weather_keyword in prompt_lower for weather_keyword in ['weather', 'temperature', 'forecast']):
+        #    tools.append(get_weather_tool)
+        
+        # if any(stock_keyword in prompt_lower for stock_keyword in ['stock', 'price', 'market', 'share', 'trade', 'news']):
+        #    tools.extend([stock_news_tool, get_time_series_daily_tool, get_time_series_daily_and_plot_tool])
         
         return tools
 
     def select_most_relevant_tool(self, tools, prompt):
         prompt_lower = prompt.lower()
         tool_priority = {
-            'get_weather': ['weather', 'temperature', 'forecast'],
             'stock_news': ['news', 'article', 'story'],
-            'get_time_series_daily_and_plot': ['graph', 'plot', 'chart', 'visualization'],
-            'get_time_series_daily': ['price', 'stock', 'value', 'market']
+            #'get_weather': ['weather', 'temperature', 'forecast'],
+            #'get_time_series_daily_and_plot': ['graph', 'plot', 'chart', 'visualization'],
+            #'get_time_series_daily': ['price', 'stock', 'value', 'market']
         }
         
         for tool_name, keywords in tool_priority.items():
@@ -324,9 +326,9 @@ class ConversationalAssistant:
     def handle_tool_calls(self, tool_calls, prompt):
         available_functions = {
             'stock_news': lambda stock: stock_news(stock),
-            'get_weather': lambda location: get_weather(location, OPENWEATHER_API_KEY),
-            'get_time_series_daily': lambda symbol: get_time_series_daily(symbol, ALPHA_VANTAGE_API_KEY),
-            'get_time_series_daily_and_plot': lambda symbol: get_time_series_daily_and_plot(symbol, ALPHA_VANTAGE_API_KEY),
+            # 'get_weather': lambda location: get_weather(location, OPENWEATHER_API_KEY),
+            #'get_time_series_daily': lambda symbol: get_time_series_daily(symbol, ALPHA_VANTAGE_API_KEY),
+            # 'get_time_series_daily_and_plot': lambda symbol: get_time_series_daily_and_plot(symbol, ALPHA_VANTAGE_API_KEY),
         }
 
         results = []
@@ -362,7 +364,12 @@ def main():
         elif user_input == '':
             continue
         elif user_input == 'tools':
-            print("\nAvailable Tools:", [tool['function']['name'] for tool in [stock_news_tool, get_time_series_daily_tool, get_time_series_daily_and_plot_tool, get_weather_tool]])
+            print("\nAvailable Tools:", [tool['function']['name'] for tool in [
+                stock_news_tool, 
+                #get_time_series_daily_tool, 
+                #get_time_series_daily_and_plot_tool, 
+                #get_weather_tool
+                ]])
             continue
             
         try:
