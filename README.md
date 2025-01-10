@@ -38,14 +38,13 @@ ollama pull llama3.2
 ```
 
 ## Run  
+In terminal
+```bash
+python .\src\agent.py
+```
 Web UI
 ```bash
-streamlit run .\src\webUI.py
-```
-
-## Flask API EndPoint
-```bash
-http://127.0.0.1:5000/stock/{symbol}
+streamlit run .\src\streamlit_local.py
 ```
 
 ## Disclaimer 
