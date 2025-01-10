@@ -4,8 +4,11 @@ from bs4 import BeautifulSoup
 import json
 from datetime import datetime
 import os
-from ollama import chat
+from ollama import Client  # Import the Ollama Client
 import time
+
+# Initialize the Ollama client to connect to the local server
+ollama_client = Client(host='http://localhost:11434')
 
 # Yahoo Finance scraping functions
 def extract_article_details(url: str, headers: str) -> dict:
@@ -73,8 +76,8 @@ def stock_news(stock):
         5. Focus on factual information and recent developments
         """
         
-        response = chat(
-            'llama3.2',  
+        response = ollama_client.chat(
+            model='llama3.2',  
             messages=[
                 {
                     'role': 'system', 
@@ -154,8 +157,8 @@ class ConversationalAssistant:
 
         try:
             messages = [{'role': 'system', 'content': self.system_prompt}] + self.conversation_history
-            response = chat(
-                'llama3.2',
+            response = ollama_client.chat(
+                model='llama3.2',
                 messages=messages,
                 tools=necessary_tools if necessary_tools else None
             )
@@ -228,7 +231,7 @@ def main():
     st.markdown(
     """
     **Important: This app requires:**
-    1. Ollama running locally
+    1. Ollama running locally on your machine
     2. llama3.2 model installed via Ollama
 
     **Available Commands:**
