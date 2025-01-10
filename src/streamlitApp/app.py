@@ -4,11 +4,8 @@ from bs4 import BeautifulSoup
 import json
 from datetime import datetime
 import os
-from ollama import Client  # Import the Ollama Client
+from ollama import chat
 import time
-
-# Initialize the Ollama client to connect to the local server
-ollama_client = Client(host='http://localhost:11434')
 
 # Yahoo Finance scraping functions
 def extract_article_details(url: str, headers: str) -> dict:
@@ -60,7 +57,7 @@ def scrape_yahoo_finance_news(stock: str) -> list:
     return articles
 
 # Tool definitions
-def stock_news(stock):
+def stock_news(stock, user_input):
     try:
         articles = scrape_yahoo_finance_news(stock)
         summary_prompt = f"""
@@ -76,8 +73,8 @@ def stock_news(stock):
         5. Focus on factual information and recent developments
         """
         
-        response = ollama_client.chat(
-            model='llama3.2',  
+        response = chat(
+            'llama3.2',  
             messages=[
                 {
                     'role': 'system', 
@@ -104,9 +101,10 @@ stock_news_tool = {
         'description': 'Fetch the news articles for a given stock.',
         'parameters': {
             'type': 'object',
-            'required': ['stock'],
+            'required': ['stock', 'user_input'],
             'properties': {
                 'stock': {'type': 'string', 'description': 'The stock ticker symbol (e.g., "NVDA").'},
+                'user_input': {'type': 'string', 'description': 'The user input to generate the summary.'},
             },
         },
     },
@@ -157,8 +155,8 @@ class ConversationalAssistant:
 
         try:
             messages = [{'role': 'system', 'content': self.system_prompt}] + self.conversation_history
-            response = ollama_client.chat(
-                model='llama3.2',
+            response = chat(
+                'llama3.2',
                 messages=messages,
                 tools=necessary_tools if necessary_tools else None
             )
@@ -192,7 +190,7 @@ class ConversationalAssistant:
 
     def handle_tool_calls(self, tool_calls, prompt):
         available_functions = {
-            'stock_news': lambda stock: stock_news(stock),
+            'stock_news': lambda stock, user_input: stock_news(stock, user_input),
         }
 
         results = []
@@ -200,7 +198,15 @@ class ConversationalAssistant:
             function_to_call = available_functions.get(tool.function.name)
             if function_to_call:
                 try:
-                    result = function_to_call(**tool.function.arguments)
+                    # Extract the arguments from the tool call
+                    tool_args = tool.function.arguments
+                    if isinstance(tool_args, str):
+                        tool_args = json.loads(tool_args)
+                    
+                    # Add the user input (prompt) to the arguments
+                    tool_args['user_input'] = prompt
+                    
+                    result = function_to_call(**tool_args)
                     results.append(f"{tool.function.name} result: {result}")
                 except Exception as e:
                     results.append(f"Error in {tool.function.name}: {str(e)}")
@@ -231,7 +237,7 @@ def main():
     st.markdown(
     """
     **Important: This app requires:**
-    1. Ollama running locally on your machine
+    1. Ollama running locally
     2. llama3.2 model installed via Ollama
 
     **Available Commands:**

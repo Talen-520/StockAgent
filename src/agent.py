@@ -13,41 +13,54 @@ OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")
 ALPHA_VANTAGE_API_KEY = os.getenv("ALPHA_VANTAGE_API_KEY")
 
 # 2. Function
-def stock_news(stock):
+def stock_news(stock,user_input):
     """
     Summarize news articles for a given stock symbol.
 
     Args:
         stock (str): The stock ticker symbol (e.g., "NVDA").
+        user_input (str): The user input to generate the summary.
 
     Returns:
         str: Summarized news articles or an error message.
     """
     try:
         articles = scrape_yahoo_finance_news(stock)
-        summary_prompt = f"""
-        Analyze and summarize the following news articles (max 10) for {stock} with following, each articles includes title, content, url and timestamp, here is articles:
+        system_prompt = f"""
+        Analyze and summarize the following news articles (max 10) for {stock}. Each article includes a title, content, URL, and timestamp. Here are the articles:
 
         {articles}
 
         Summary Guidelines:
-        1. Provide a concise overview of the key news for {stock}
-        2. Highlight the most significant information from each article, the article is inside of json content 
-        3. Include key insights of each articles, tell user that news source from yahoo finance and how many articles you summarized 
-        4. Organize the summary in a clear, easy-to-read format
-        5. Focus on factual information and recent developments
-        
+        1. Provide a concise overview of the key news from {stock}.
+        2. Highlight the most significant information from each article.
+        3. Include detailed information for each article, including:
+           - Title
+           - Key content points
+           - URL
+           - Timestamp
+        4. Organize the summary in a clear, easy-to-read format.
+        5. Focus on factual information and recent developments.
+        6. Clearly state that the news is sourced from Yahoo Finance and mention the total number of articles summarized (10).
+
+        Output Structure:
+        - **Overview**: A brief summary of all articles.
+        - **Detailed Summaries**: For each article, provide:
+          - Title
+          - Key content points
+          - URL
+          - Timestamp
         """
-        
+
         # Use Ollama to generate a summary, we call the model and provide the summary prompt again as the user input
         response: ChatResponse = chat(
             'llama3.2',  
             messages=[
                 {
                     'role': 'system', 
-                    'content': f"You are a professional financial news summarizer. Provide a clear, informative summary of {stock} stock news."
+                    'content': system_prompt
                 },
-                {'role': 'user', 'content': summary_prompt},
+                {'role': 'user', 'content': user_input},
             ],
             options={
                 'num_ctx': 8192  # Specify the context window size to allow longer inputs
@@ -174,9 +187,10 @@ stock_news_tool = {
         'description': 'Fetch the news articles for a given stock.',
         'parameters': {
             'type': 'object',
-            'required': ['stock'],
+            'required': ['stock','user_input'],
             'properties': {
                 'stock': {'type': 'string', 'description': 'The stock ticker symbol (e.g., "NVDA").'},
+                'user_input': {'type': 'string', 'description': 'The user input to generate the summary.'},
             },
         },
     },
@@ -325,9 +339,9 @@ class ConversationalAssistant:
 
     def handle_tool_calls(self, tool_calls, prompt):
         available_functions = {
-            'stock_news': lambda stock: stock_news(stock),
+            'stock_news': lambda stock, user_input: stock_news(stock, user_input),
             # 'get_weather': lambda location: get_weather(location, OPENWEATHER_API_KEY),
-            #'get_time_series_daily': lambda symbol: get_time_series_daily(symbol, ALPHA_VANTAGE_API_KEY),
+            # 'get_time_series_daily': lambda symbol: get_time_series_daily(symbol, ALPHA_VANTAGE_API_KEY),
             # 'get_time_series_daily_and_plot': lambda symbol: get_time_series_daily_and_plot(symbol, ALPHA_VANTAGE_API_KEY),
         }
 
@@ -336,13 +350,21 @@ class ConversationalAssistant:
             function_to_call = available_functions.get(tool.function.name)
             if function_to_call:
                 try:
-                    result = function_to_call(**tool.function.arguments)
+                    # Extract the arguments from the tool call
+                    tool_args = tool.function.arguments
+                    if isinstance(tool_args, str):
+                        tool_args = json.loads(tool_args)
+                    
+                    # Add the user input (prompt) to the arguments if the function is stock_news
+                    if tool.function.name == 'stock_news':
+                        tool_args['user_input'] = prompt
+                    
+                    result = function_to_call(**tool_args)
                     results.append(f"{tool.function.name} result: {result}")
                 except Exception as e:
                     results.append(f"Error in {tool.function.name}: {str(e)}")
 
         return "\n".join(results)
-
     def clear_conversation(self):
         """Clear the conversation history"""
         self.conversation_history = []
