@@ -48,7 +48,6 @@ def show_tools():
     st.warning(f"Disabled Tools: {', '.join(disabled)}", )
 
 def main():
-    # Set the title with custom font size
     st.markdown(
         """
         <h1 style="font-size: 28px; margin-bottom: 20px;">
@@ -94,6 +93,8 @@ def main():
         f"""
         <div style="font-size: 14px; color: gray; text-align: center; margin-top: 10px;">
             Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+            <br>
+            Refresh every 5 seconds
         </div>
         """,
         unsafe_allow_html=True
@@ -129,7 +130,7 @@ def main():
             st.write(message["content"])
 
     # Auto-refresh
-    time.sleep(2)
+    time.sleep(5)
     st.rerun()
 
 if __name__ == "__main__":

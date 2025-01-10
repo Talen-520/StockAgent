@@ -32,6 +32,8 @@ def main():
 
     st.markdown(
     """
+    **You must run Ollama and install `llama3.2:3b` to use this chat.**
+
     **Command Available:**  
     - `clear` - clear chat history  
     - `exit` - exit the chat  
