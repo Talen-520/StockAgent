@@ -2,10 +2,8 @@
 
 **StockAgent is an intelligent AI-powered tool that provides real-time stock market insights, news summaries, and data analysis. Leveraging advanced AI and multiple financial APIs, it helps users quickly understand market trends and company news.**
 
-### Tools and Platforms
+### Tools 
 - [Ollama](https://ollama.com/) - Local AI model runner
-- Alpha Vantage API (for stock data)
-- OpenWeatherMap API (for weather information)
 
 ## Get Started
 

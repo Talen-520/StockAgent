@@ -1,9 +1,10 @@
+from typing import List, Dict, Any, Optional, Union
 from ollama import chat
 from ollama import ChatResponse
 from src.tools import scrape_yahoo_finance_news
 
 # agent tools
-def stock_news(stock):
+def stock_news(stock: str) -> str:
     """
     Summarize news articles for a given stock symbol.
 
@@ -13,13 +14,12 @@ def stock_news(stock):
     Returns:
         str: Summarized news articles or an error message.
     """
+    print("task transferred to stock agent")
     try:
-        articles = scrape_yahoo_finance_news(stock)
-        summary_prompt = f"""
+        articles: List[Dict[str, Any]] = scrape_yahoo_finance_news(stock)
+        summary_prompt: str = f"""
         Analyze and summarize the following news articles (max 10) for {stock} with following, each articles includes title, content, url and timestamp, here is articles:
-
         {articles}
-
         Summary Guidelines:
         1. Provide a concise overview of the key news for {stock}
         2. Highlight the most significant information from each article, the article is inside of json content 
@@ -28,7 +28,6 @@ def stock_news(stock):
         5. Focus on factual information and recent developments
         
         """
-        
         # Use Ollama to generate a summary, we call the model and provide the summary prompt again as the user input
         response: ChatResponse = chat(
             'llama3.2',  
@@ -48,12 +47,12 @@ def stock_news(stock):
         return response['message']['content']
 
     except Exception as e:
-        error_message = f"Error retrieving or summarizing news for {stock}: {str(e)}"
+        error_message: str = f"Error retrieving or summarizing news for {stock}: {str(e)}"
         print(error_message) 
         return error_message
 
 # Tool definitions
-stock_news_tool = {
+stock_news_tool: Dict[str, Any] = {
     'type': 'function',
     'function': {
         'name': 'stock_news',
@@ -69,23 +68,23 @@ stock_news_tool = {
 }
 
 class ConversationalAssistant:
-    def __init__(self):
-        self.conversation_history = []
-        self.system_prompt = """
+    def __init__(self) -> None:
+        self.conversation_history: List[Dict[str, str]] = []
+        self.system_prompt: str = """
         You are an AI assistant.
         """
 
-    def determine_tool_necessity(self, prompt):
-        prompt_lower = prompt.lower()
+    def determine_tool_necessity(self, prompt: str) -> List[Dict[str, Any]]:
+        prompt_lower: str = prompt.lower()
         
-        tools = []
+        tools: List[Dict[str, Any]] = []
         if any(stock_keyword in prompt_lower for stock_keyword in ['stock', 'price', 'market', 'share', 'trade', 'news']):
             tools.append(stock_news_tool) 
         return tools
 
-    def select_most_relevant_tool(self, tools, prompt):
-        prompt_lower = prompt.lower()
-        tool_priority = {
+    def select_most_relevant_tool(self, tools: List[Dict[str, Any]], prompt: str) -> List[Dict[str, Any]]:
+        prompt_lower: str = prompt.lower()
+        tool_priority: Dict[str, List[str]] = {
             'stock_news': ['news', 'article', 'story'],
         }
         
@@ -95,20 +94,20 @@ class ConversationalAssistant:
         
         return tools
 
-    def process_user_input(self, user_input):
+    def process_user_input(self, user_input: str) -> str:
         # Add user input to conversation history
         self.conversation_history.append({'role': 'user', 'content': user_input})
         
         # Determine necessary tools
-        necessary_tools = self.determine_tool_necessity(user_input)
+        necessary_tools: List[Dict[str, Any]] = self.determine_tool_necessity(user_input)
         if necessary_tools:
             necessary_tools = self.select_most_relevant_tool(necessary_tools, user_input)
 
         try:
             # Get response from LLM
-            messages = [{'role': 'system', 'content': self.system_prompt}] + self.conversation_history
+            messages: List[Dict[str, str]] = [{'role': 'system', 'content': self.system_prompt}] + self.conversation_history
             
-            response = chat(
+            response: Union[ChatResponse, Dict[str, Any]] = chat(
                 'llama3.2',
                 messages=messages,
                 tools=necessary_tools if necessary_tools else None
@@ -116,17 +115,17 @@ class ConversationalAssistant:
 
             # Extract the response content
             if isinstance(response, dict) and 'message' in response:
-                message_content = response['message'].get('content', '')
-                tool_calls = response['message'].get('tool_calls', [])
+                message_content: str = response['message'].get('content', '')
+                tool_calls: List[Dict[str, Any]] = response['message'].get('tool_calls', [])
             else:
-                message_content = response.message.content
-                tool_calls = getattr(response.message, 'tool_calls', [])
+                message_content: str = response.message.content
+                tool_calls: List[Dict[str, Any]] = getattr(response.message, 'tool_calls', [])
 
             # Process tool calls if any
             if tool_calls:
-                tool_results = self.handle_tool_calls(tool_calls, user_input)
+                tool_results: str = self.handle_tool_calls(tool_calls, user_input)
                 # Add tool results to conversation for context
-                full_response = f"Tool Results: {tool_results}\n\n{message_content}"
+                full_response: str = f"Tool Results: {tool_results}\n\n{message_content}"
                 self.conversation_history.append({
                     'role': 'assistant',
                     'content': full_response
@@ -140,44 +139,44 @@ class ConversationalAssistant:
                 return message_content
 
         except Exception as e:
-            error_message = f"Error processing response: {str(e)}"
+            error_message: str = f"Error processing response: {str(e)}"
             print(error_message)
             return error_message
 
-    def handle_tool_calls(self, tool_calls, prompt):
-        available_functions = {
+    def handle_tool_calls(self, tool_calls: List[Dict[str, Any]], prompt: str) -> str:
+        available_functions: Dict[str, Any] = {
             # add tools here
             'stock_news': lambda stock: stock_news(stock),
         }
 
-        results = []
+        results: List[str] = []
         for tool in tool_calls:
-            function_to_call = available_functions.get(tool.function.name)
+            function_to_call: Optional[Any] = available_functions.get(tool.function.name)
             if function_to_call:
                 try:
-                    result = function_to_call(**tool.function.arguments)
+                    result: str = function_to_call(**tool.function.arguments)
                     results.append(f"{tool.function.name} result: {result}")
                 except Exception as e:
                     results.append(f"Error in {tool.function.name}: {str(e)}")
 
         return "\n".join(results)
 
-    def clear_conversation(self):
+    def clear_conversation(self) -> str:
         """Clear the conversation history"""
-        self.conversation_history = []
+        self.conversation_history: List[Dict[str, str]] = []
         return "Conversation history cleared."
 
-def main():
-    assistant = ConversationalAssistant()
+def main() -> None:
+    assistant: ConversationalAssistant = ConversationalAssistant()
     print("Hello! I'm your Stock Agent. How can I help you today? (Type 'exit/quit' to end the conversation or 'clear' to start fresh or 'tools' to see available tools)")
     
     while True:
-        user_input = input("\nYou: ").strip()
+        user_input: str = input("\nYou: ").strip()
         
-        if user_input.lower() == 'exit' or user_input.lower() == 'quit' or user_input.lower() == 'q' or user_input.lower() == 'bye':
+        if user_input.lower() in ['exit', 'quit', 'q', 'bye']:
             print("\nAssistant: quitting the conversation.")
             break
-        elif user_input.lower() == 'clear' or user_input.lower() == 'reset':
+        elif user_input.lower() in ['clear', 'reset']:
             print("\nAssistant:", assistant.clear_conversation())
             continue
         elif user_input == '':
@@ -189,7 +188,7 @@ def main():
             continue
             
         try:
-            response = assistant.process_user_input(user_input)
+            response: str = assistant.process_user_input(user_input)
             print("\nAssistant:", response)
         except Exception as e:
             print(f"\nAn error occurred: {str(e)}")
