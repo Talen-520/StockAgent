@@ -1,14 +1,21 @@
 import streamlit as st
-import io
-import PyPDF2
+from langchain.document_loaders import PyPDFLoader
 from ollama import chat
+import io
 
-# Function to extract text from PDF
+# Function to extract text from PDF using LangChain's PyPDFLoader
 def extract_text_from_pdf(uploaded_file):
-    pdf_reader = PyPDF2.PdfReader(io.BytesIO(uploaded_file.read()))
-    text = ""
-    for page in pdf_reader.pages:
-        text += page.extract_text()
+    # Save the uploaded file to a temporary location
+    with open("temp.pdf", "wb") as f:
+        f.write(uploaded_file.getbuffer())
+    
+    # Use PyPDFLoader to load the PDF
+    loader = PyPDFLoader("temp.pdf")
+    pages = loader.load()
+    
+    # Combine text from all pages
+    text = " ".join([page.page_content for page in pages])
+    print(text)
     return text
 
 def initialize_session_state():
@@ -21,13 +28,15 @@ def display_chat_history():
             st.write(message["content"])
 
 # Function to handle user input and model response
-def handle_user_input(user_input, pdf_text):
-    if user_input:
-        st.session_state.chat_history.append({"role": "User", "content": user_input})
+def handle_user_input(prompt, pdf_text):
+    if prompt:
+        st.session_state.chat_history.append({"role": "User", "content": prompt})
 
         with st.chat_message("User"):
-            st.write(user_input)
-
+            st.write(prompt)
+        
+        # Include the PDF text in the prompt if available
+        prompt = f"PDF Text: {pdf_text}\n\nUser Question: {prompt}" if pdf_text else prompt
         messages = [
             {
                 "role": "system",
@@ -35,7 +44,7 @@ def handle_user_input(user_input, pdf_text):
             },
             {
                 "role": "user",
-                "content": f"PDF Text: {pdf_text}\n\nUser Question: {user_input}"
+                "content": prompt
             }
         ]
 

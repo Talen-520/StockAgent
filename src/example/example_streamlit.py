@@ -3,6 +3,7 @@ from ollama import chat
 
 def main():
     st.title('Chatbot')
+    
     st.caption("Welcome! You are using the `deepseek-r1:7b` model.")
 
     # Initialize chat history
@@ -16,11 +17,11 @@ def main():
 
 
     # User input
-    if user_input := st.chat_input("Enter your message"):
-        st.session_state.chat_history.append({"role": "User", "content": user_input})
+    if prompt := st.chat_input("Enter your message"):
+        st.session_state.chat_history.append({"role": "User", "content": prompt})
 
         with st.chat_message("User"):
-            st.write(user_input)
+            st.write(prompt)
 
         # Stream model response
         with st.chat_message("ai"):
@@ -30,7 +31,7 @@ def main():
             try:
                 response = chat(
                 'deepseek-r1:7b', 
-                messages=[{"role": "user", "content": user_input}], 
+                messages=[{"role": "user", "content": prompt}], 
                 stream=True, 
                 options={'num_ctx': 8192}  
             )
