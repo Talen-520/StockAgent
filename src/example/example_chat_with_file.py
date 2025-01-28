@@ -1,5 +1,5 @@
 import streamlit as st
-from langchain.document_loaders import PyPDFLoader
+from langchain_community.document_loaders import PyPDFLoader
 from ollama import chat
 import io
 
