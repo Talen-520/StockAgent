@@ -1,8 +1,9 @@
+
 import sys
 import os
-sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'src'))  # Add src to PATH, adjust the path based on the file location
 import unittest  
-from tools import scrape_yahoo_finance_news  # Import from tools package
+
+from src.tools import scrape_yahoo_finance_news  
 
 
 class TestScraper(unittest.TestCase):

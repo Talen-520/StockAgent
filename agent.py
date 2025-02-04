@@ -6,7 +6,7 @@ import matplotlib.dates as mdates
 import os
 import json
 from dotenv import load_dotenv
-from tools import scrape_yahoo_finance_news
+from src.tools import scrape_yahoo_finance_news
 
 load_dotenv()
 OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")

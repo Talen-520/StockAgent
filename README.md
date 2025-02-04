@@ -13,18 +13,9 @@ git clone https://github.com/Talen-520/StockAgent.git
 cd StockAgent
 ```
 
-### 2. Create Virtual Environment And Install Dependencies
-#### windows
+### Install Dependencies
 
 ```bash
-python -m venv venv
-.\venv\Scripts\activate
-pip install -r requirements.txt
-```
-#### macOS/Linux
-```bash
-python3 -m venv venv
-source venv/bin/activate
 pip install -r requirements.txt
 ```
 
@@ -32,13 +23,13 @@ pip install -r requirements.txt
 - Download and install from [Ollama's official website](https://ollama.com/)
 - Pull model like Llama3.2 model:
 ```bash
-ollama pull llama3.2
+ollama pull llama3.2 
 ```
 
 ## Run  
 In terminal
 ```bash
-python .\src\agent.py
+python agent.py
 ```
 Web UI
 ```bash
