@@ -12,4 +12,5 @@ def web_search(query):
 
 if __name__ == "__main__":
     # Perform a search
-    search("what is duckduckgo")
+    result = web_search("what is duckduckgo")
+    print(result)

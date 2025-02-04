@@ -1,94 +1,99 @@
 import streamlit as st
 import requests
 import re
-
 from ollama import chat
-from tools import web_search
-from concurrent.futures import ThreadPoolExecutor # Parallel Processing for Web Scraping
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from duckduckgo_search import DDGS
+from functools import lru_cache
 
-# Function to extract text from html from Jina llm
-def html_to_markdown(html):
+# Cache search results to avoid repeating searches
+@lru_cache(maxsize=32)
+def web_search(query, max_results=3):
     try:
-        messages = [{'role': 'user', 'content': html}]
-        response = chat('reader-lm:latest', messages=messages)
-        print(response['message']['content'])
-        return response['message']['content']
+        return DDGS().text(query, max_results=max_results)
     except Exception as e:
-        print(f"Error during HTML to Markdown conversion: {e}")
-        return ""
-    
-# scrape web content
+        st.error(f"Search error: {e}")
+        return []
+
+# Lightweight HTML cleaner (alternative to LLM conversion)
+def clean_html(html):
+    from bs4 import BeautifulSoup
+    soup = BeautifulSoup(html, 'html.parser')
+    # Remove script and style elements
+    for script in soup(["script", "style", "nav", "footer", "header"]):
+        script.decompose()
+    return soup.get_text(separator='\n', strip=True)
+
+# Parallel processing with timeout control
 def scrape_web(query):
     results = web_search(query)
     web_content = []
-
-    def fetch_and_convert(result):
-        url = result['href']
+    
+    def fetch_content(result):
         try:
-            response = requests.get(url, timeout=10)
-            response.raise_for_status()
-            return html_to_markdown(response.text)
-        except requests.exceptions.RequestException as e:
-            print(f"Error fetching {url}: {e}")
+            with requests.get(result['href'], timeout=3) as response:
+                response.raise_for_status()
+                return clean_html(response.text)[:5000]  # Limit content length
+        except Exception as e:
             return None
 
-    with ThreadPoolExecutor(max_workers=5) as executor:
-        web_content = list(executor.map(fetch_and_convert, results))
+    with ThreadPoolExecutor(max_workers=3) as executor:
+        futures = [executor.submit(fetch_content, r) for r in results]
+        for future in as_completed(futures, timeout=5):
+            if content := future.result():
+                web_content.append(content)
+            if len(web_content) >= 2:  # Early exit if we get 2 good results
+                break
 
-    # Filter out None values
-    web_content = [content for content in web_content if content is not None]
-    return web_content
+    return web_content[:2]  # Return max 2 results
+
+def handle_user_input(prompt):
+    if not prompt:
+        return
+
+    with st.spinner('Analyzing...'):
+        st.session_state.chat_history.append({"role": "user", "content": prompt})
+        
+        # Only search when needed (detect question keywords)
+        if 'search' in prompt.lower() or any(w in prompt.lower() for w in ['who', 'what', 'when', 'where', 'why']):
+            web_content = scrape_web(prompt)
+        else:
+            web_content = []
+
+        messages = [{
+            "role": "system",
+            "content": "Answer concisely. Use markdown for formatting." + 
+                      (f"\nWeb context: {web_content}" if web_content else "")
+        }, {
+            "role": "user",
+            "content": prompt
+        }]
+
+        # Use faster model for response
+        response = chat('deepseek-r1:7b', messages=messages, stream=True, 
+                       options={'temperature': 0.5, 'num_ctx': 4096*2})
+
+        full_response = ""
+        response_container = st.empty()
+        for chunk in response:
+            if chunk.get('message', {}).get('content'):
+                full_response += chunk['message']['content']
+                response_container.markdown(full_response + "▌")
+
+        response_container.markdown(full_response)
+        st.session_state.chat_history.append({"role": "assistant", "content": full_response})
+
+def main():
+    st.title('⚡ QuickChat with Web Search')
     
-def initialize_session_state():
     if 'chat_history' not in st.session_state:
         st.session_state.chat_history = []
 
-def display_chat_history():
-    for message in st.session_state.chat_history:
-        with st.chat_message(message["role"]):
-            st.write(message["content"])
+    for msg in st.session_state.chat_history:
+        st.chat_message(msg["role"]).write(msg["content"])
 
-# Function to handle user input and model response
-def handle_user_input(prompt):
-    if prompt:
-        st.session_state.chat_history.append({"role": "User", "content": prompt})
-
-        with st.chat_message("User"):
-            st.write(prompt)
-        
-        search_results = scrape_web(prompt)
-        messages = [
-            {
-                "role": "system",
-                "content": "You are a helpful assistant. if user provide web search content, analyze markdown provided for user question."
-            },
-            {
-                "role": "user",
-                "content":f'user question {prompt}. Web search content: {search_results}'
-            }
-        ]
-
-        with st.chat_message("Model"):
-            response_placeholder = st.empty()  
-            full_response = ""
-
-            # Use the Ollama chat function
-            response = chat('deepseek-r1:7b', messages=messages, stream=True, options={'num_ctx': 8192})
-            for chunk in response:
-                if "message" in chunk and "content" in chunk["message"]:
-                    full_response += chunk["message"]["content"]
-                    response_placeholder.write(full_response)  
-
-        st.session_state.chat_history.append({"role": "Model", "content": full_response})
-
-def main():
-    st.title('Chat with web-search using Ollama')
-
-    initialize_session_state()
-    display_chat_history()
-
-    prompt = st.chat_input("Ask a question with web search")
-    handle_user_input(prompt)
+    if prompt := st.chat_input("Ask me anything (use 'search' for web queries)"):
+        handle_user_input(prompt)
 
 if __name__ == "__main__":
     main()

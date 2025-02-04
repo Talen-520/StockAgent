@@ -9,7 +9,7 @@ def extract_article_details(url: str, headers: str) -> list  :
         soup = BeautifulSoup(response.text, 'html.parser')
 
         # Title extraction
-        title = soup.find('div', class_='cover-title yf-1at0uqp')
+        title = soup.find('div', class_='cover-title yf-1rjrr1')
         title_text = title.text.strip() if title else "No title found"
 
         # Content extraction
@@ -44,7 +44,7 @@ def scrape_yahoo_finance_news(stock: str) -> list:
     soup = BeautifulSoup(response.text, 'html.parser')
 
     # Extract article URLs
-    links = soup.find_all('div', class_='yf-18q3fnf')
+    links = soup.find_all('div', class_='content yf-82qtw3')
     article_urls = [
         link.find('a')['href'] 
         for link in links 
@@ -53,6 +53,7 @@ def scrape_yahoo_finance_news(stock: str) -> list:
 
     articles = []
     # Limit to first 10 articles
+    print(f"Extracted {len(article_urls)} article URLs.")
     for article_url in article_urls[:10]:
         article_details = extract_article_details(article_url, headers)
         if article_details:
