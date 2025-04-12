@@ -21,9 +21,9 @@ pip install -r requirements.txt
 
 ### 3. Install Ollama
 - Download and install from [Ollama's official website](https://ollama.com/)
-- Pull model like Llama3.2 model:
+- Pull model like qwen2.5 model:
 ```bash
-ollama pull llama3.2 
+ollama pull qwen2.5
 ```
 
 ## Run  

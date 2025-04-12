@@ -8,19 +8,19 @@ from functools import lru_cache
 
 # Cache search results to avoid repeating searches
 @lru_cache(maxsize=32)
-def web_search(query, max_results=3):
+def web_search(query):
     try:
-        return DDGS().text(query, max_results=max_results)
+        return DDGS().text(query, max_results=20) # adjust max_results as needed, each result followed by {title, href(url), description}
     except Exception as e:
         st.error(f"Search error: {e}")
         return []
 
-# Lightweight HTML cleaner (alternative to LLM conversion)
+# Data clearning, alternative to Jina reader-lm
 def clean_html(html):
     from bs4 import BeautifulSoup
     soup = BeautifulSoup(html, 'html.parser')
-    # Remove script and style elements
-    for script in soup(["script", "style", "nav", "footer", "header"]):
+    # Remove non-text content (e.g., JavaScript, CSS, navigation links, or graphical elements) 
+    for script in soup(["script", "style", "nav", "footer", "header","canvas",]):
         script.decompose()
     return soup.get_text(separator='\n', strip=True)
 
@@ -42,10 +42,10 @@ def scrape_web(query):
         for future in as_completed(futures, timeout=5):
             if content := future.result():
                 web_content.append(content)
-            if len(web_content) >= 2:  # Early exit if we get 2 good results
+            if len(web_content) >= 10:  # Early exit if we get 10 good results
                 break
 
-    return web_content[:2]  # Return max 2 results
+    return web_content[:10]  # Return max 2 results
 
 def handle_user_input(prompt):
     if not prompt:
