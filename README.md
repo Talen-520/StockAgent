@@ -13,15 +13,17 @@ git clone https://github.com/Talen-520/StockAgent.git
 cd StockAgent
 ```
 
-### Install Dependencies
+### 2. Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
 ### 3. Install Ollama
-- Download and install from [Ollama's official website](https://ollama.com/)
-- Pull model like qwen2.5 model:
+- Download and install  [Ollama](https://ollama.com/)
+- For best experience, I don't recommend any model under 7b
+- Pull open source model like qwen2.5 model, if you aren't using qwen2.5, change line 71 to correct model name under /agent.py 
+
 ```bash
 ollama pull qwen2.5
 ```

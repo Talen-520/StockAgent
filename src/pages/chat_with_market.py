@@ -2,7 +2,7 @@ import streamlit as st
 import yfinance as yf
 from datetime import datetime
 import time
-from agent import *
+from agentDeprecated import *
 
 def initialize_state():
     if 'financechat_assistant' not in st.session_state:  # Unique key for assistant
