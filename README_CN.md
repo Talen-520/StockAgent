@@ -4,11 +4,8 @@
 )
 [![Download](https://img.shields.io/github/downloads/Talen-520/StockAgent/total)](https://img.shields.io/github/downloads/Talen-520/StockAgent/total)
 
-<p align="center">
-  中文
-  ｜
-  <a href="https://github.com/Talen-520/StockAgent/blob/main/README.md">English</a>
-</p>
+
+中文｜<a href="https://github.com/Talen-520/StockAgent/blob/main/README.md">English</a>
 
 **StockAgent 是一个开源的AI工具，通过向开源模型提供工具实现股票市场洞察、新闻摘要和数据分析、帮助用户快速理解市场趋势和公司新闻。**
 ### 工具  
