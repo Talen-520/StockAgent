@@ -1,5 +1,15 @@
 # StockAgent 
 
+[![support-version](https://img.shields.io/pypi/pyversions/coredumpy)](https://img.shields.io/badge/https%3A%2F%2Fgithub.com%2FTalen-520%2FStockAgent
+)
+[![Download](https://img.shields.io/github/downloads/Talen-520/StockAgent/total)](https://img.shields.io/github/downloads/Talen-520/StockAgent/total)
+
+<p align="center">
+  English
+  ｜
+  <a href="https://github.com/Talen-520/StockAgent/blob/main/README_CN.md">English</a>
+</p>
+
 **StockAgent is an intelligent AI-powered tool that provides real-time stock market insights, news summaries, and data analysis. Leveraging advanced AI and multiple financial APIs, it helps users quickly understand market trends and company news.**
 
 ### Tools 
