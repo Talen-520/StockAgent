@@ -156,7 +156,7 @@ class YahooFinanceScraper:
         return filepath
 
 
-def main(stock_symbol: str, max_articles: int = 10) -> List[ArticleDetails]:
+def scrape_yahoo_finance_news(stock_symbol: str, max_articles: int = 10) -> List[ArticleDetails]:
     """Main function to run the scraper."""
     # Create config with validation
     config = ScraperConfig(stock_symbol=stock_symbol, max_articles=max_articles)
@@ -176,4 +176,4 @@ if __name__ == "__main__":
     print("Running the script directly")
     stock = "NVDA"
     print(f"Scraping news for stock: {stock}")
-    articles = main(stock)
+    articles = scrape_yahoo_finance_news(stock)
