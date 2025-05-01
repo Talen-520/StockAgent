@@ -2,7 +2,7 @@ from ollama import ChatResponse
 from src.tools import scrape_yahoo_finance_news
 import asyncio
 import ollama
-
+#tools implementation
 def retrieve_stock_news(stock: str) -> list:
     """
     Summarize news articles for a given stock symbol.
@@ -19,11 +19,10 @@ def retrieve_stock_news(stock: str) -> list:
 
     except Exception as e:
         error_message = f"Error retrieving or summarizing news for {stock}: {str(e)}"
-        print(error_message) 
+        print(error_message)
         return error_message
-    
 
-
+# define the system prompt and the agent's behavior
 system_prompt = f"""
         you are a helpful financial assistant. Your task is to analyze and detailed summarize news from every articles for a given stock symbol, you are able to use tools to retrieve most recent news.
 
@@ -32,10 +31,10 @@ system_prompt = f"""
         Summary Guidelines:
         1. Highlight the most significant information from each article.
         2. Include detailed information for each article, including:
-           - Title
-           - Key content points
-           - URL
-           - Timestamp
+            - Title
+            - Key content points
+            - URL
+            - Timestamp
         3. Organize the summary in a clear, easy-to-read format.
         4. Focus on factual information and recent developments.
         5. clearly state number of articles retrieved and summarized.
@@ -50,9 +49,11 @@ system_prompt = f"""
 
 messages = [{'role': 'system', 'content': system_prompt}]
 
+# Define the available functions and their corresponding functions
 available_functions = {
-    'stock_news': retrieve_stock_news,
+    'retrieve_stock_news': retrieve_stock_news,
 }
+
 
 async def call_function(tool_call):
     """Call the function specified in the tool call and return the output."""
@@ -68,7 +69,7 @@ async def call_function(tool_call):
 
 async def main():
     client = ollama.AsyncClient()
-    model_name = 'qwen2.5'
+    model_name = 'qwen3:latest'
     while True:
         user_input = input("You: ")
         if user_input.lower() in ['exit', 'quit']:
@@ -80,13 +81,12 @@ async def main():
         response: ChatResponse = await client.chat(
             model_name,
             messages=messages,
-            tools=[retrieve_stock_news],
+            tools=[retrieve_stock_news], # Use the correctly formatted 'tools' list
             options={
-                'num_ctx': 131072   # Specify the context window size to allow longer inputs
+                'num_ctx': 131072
             }
         )
 
-         
         if response.message.tool_calls:
             for tool_call in response.message.tool_calls:
                 output = await call_function(tool_call)
@@ -100,9 +100,6 @@ async def main():
         else:
             print('Assistant:', response.message.content)
             messages.append({'role': 'assistant', 'content': response.message.content})
-
-        # debug line
-        # print(messages)
 
 if __name__ == '__main__':
     try:

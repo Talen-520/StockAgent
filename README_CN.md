@@ -28,11 +28,11 @@ pip install -r requirements.txt
 ### 3. 安装Ollama
 - 下载安装  [Ollama](https://ollama.com/)
 - 为了最佳体验，不建议使用小于7b的模型
-- 拉取开源模型如qwen2.5
-- 如果不使用qwen2.5，请修改/agent.py第71行为正确的模型名称
+- 拉取开源模型如qwen3
+- 如果不使用qwen3，请修改/agent.py第71行为正确的模型名称
 
 ```bash
-ollama pull qwen2.5
+ollama pull qwen3
 ```
 
 ## 运行  
@@ -44,6 +44,24 @@ python agent.py
 ```bash
 streamlit run .\src\streamlit_local.py
 ```
+
+## 工作流程演示
+```bash
+You: what happened to nvidia today
+Calling function: retrieve_stock_news
+Arguments: {'stock': 'NVDA'}
+Starting to scrape Yahoo Finance news for NVDA
+Found 20 unique articles, processing first 10
+Saved 10 articles to path\StockAgent\src\data\NVDA_news_articles.json
+Function output:[...]
+<think> ...</think>
+Here's a concise analysis of the key trends and implications from the provided news articles:
+
+--- 
+### **1. AI Data Center ...
+```
+
+欢迎添加你自己的自定义工具！
 
 ## Disclaimer 
 本工具仅用于学习目的。AI可能产生误导性信息。在做出任何投资决策前，请务必进行自主研究。

@@ -28,10 +28,10 @@ pip install -r requirements.txt
 ### 3. Install Ollama
 - Download and install  [Ollama](https://ollama.com/)
 - For best experience, I don't recommend any model under 7b
-- Pull open source model like qwen2.5 model, if you aren't using qwen2.5, change line 71 to correct model name under /agent.py 
+- Pull open source model like qwen3 model, if you aren't using qwen3, change line 71 to correct model name under /agent.py 
 
 ```bash
-ollama pull qwen2.5
+ollama pull qwen3
 ```
 
 ## Run  
@@ -43,6 +43,24 @@ Web UI
 ```bash
 streamlit run .\src\streamlit_local.py
 ```
+
+## Example workflow
+```bash
+You: what happened to nvidia today
+Calling function: retrieve_stock_news
+Arguments: {'stock': 'NVDA'}
+Starting to scrape Yahoo Finance news for NVDA
+Found 20 unique articles, processing first 10
+Saved 10 articles to path\StockAgent\src\data\NVDA_news_articles.json
+Function output:[...]
+<think> ...</think>
+Here's a concise analysis of the key trends and implications from the provided news articles:
+
+--- 
+### **1. AI Data Center ...
+```
+
+Feel free to implement your own tools and functions!
 
 ## Disclaimer 
 This tool is for learning purposes only. AI could make misleading information, Always conduct your own research before making financial decisions.
