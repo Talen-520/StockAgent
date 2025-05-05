@@ -59,6 +59,18 @@ Here's a concise analysis of the key trends and implications from the provided n
 --- 
 ### **1. AI Data Center ...
 ```
+## video Summarization 
+
+Enable video summarization ability for LLM, you need OpenAI API key and ffmpeg
+
+MacOS/Linux 
+```bash
+export OPENAI_API_KEY="your_api_key_here"
+```
+Windows
+```bash
+setx OPENAI_API_KEY "your_api_key_here"
+```
 
 Feel free to implement your own tools and functions!
 

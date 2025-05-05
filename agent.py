@@ -1,5 +1,5 @@
 from ollama import ChatResponse
-from src.tools import scrape_yahoo_finance_news
+from src.tools import scrape_yahoo_finance_news, speech_to_text
 import asyncio
 import ollama
 #tools implementation
@@ -23,35 +23,47 @@ def retrieve_stock_news(stock: str) -> list:
         return error_message
 
 # define the system prompt and the agent's behavior
-system_prompt = f"""
-        you are a helpful financial assistant. Your task is to analyze and detailed summarize news from every articles for a given stock symbol, you are able to use tools to retrieve most recent news.
+system_prompt = """
+Image input capabilities: Closed
 
-        if you tool is used, you should states which tool is used
+You are a helpful financial assistant. Be direct and professional.
 
-        Summary Guidelines:
-        1. Highlight the most significant information from each article.
-        2. Include detailed information for each article, including:
-            - Title
-            - Key content points
-            - URL
-            - Timestamp
-        3. Organize the summary in a clear, easy-to-read format.
-        4. Focus on factual information and recent developments.
-        5. clearly state number of articles retrieved and summarized.
-        Output Structure:
-        - **Overview**: A brief summary of all articles.
-        - **Detailed Summaries**: For each article, provide:
-          - Title
-          - Key content points
-          - URL
-          - Timestamp
-        """
+## Tools
+
+you are able to use tools, if user query missing, If the tool requires more than one parameter and the user gives an incomplete parameter,
+chase down the additional required parameters.
+If a tool is used, you should state which tool is used.
+
+## fiance news summary
+
+Summary Guidelines:
+1. Highlight the most significant information from each article.
+2. Include detailed information for each article, including:
+   - Title
+   - Key content points
+   - URL
+   - Timestamp
+3. Organize the summary in a clear, easy-to-read format.
+4. Focus on factual information and recent developments.
+5. Clearly state number of articles retrieved and summarized.
+
+Output Structure:
+- **Overview**: A brief summary of all articles.
+- **Detailed Summaries**: For each article, provide:
+  - Title
+  - Key content points
+  - URL
+  - Timestamp
+
+"""
+
 
 messages = [{'role': 'system', 'content': system_prompt}]
 
 # Define the available functions and their corresponding functions
 available_functions = {
     'retrieve_stock_news': retrieve_stock_news,
+    'speech_to_text': speech_to_text,
 }
 
 
@@ -81,7 +93,7 @@ async def main():
         response: ChatResponse = await client.chat(
             model_name,
             messages=messages,
-            tools=[retrieve_stock_news], # Use the correctly formatted 'tools' list
+            tools=[retrieve_stock_news,speech_to_text], # add tools here
             options={
                 'num_ctx': 131072
             }
