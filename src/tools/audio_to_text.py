@@ -21,7 +21,7 @@ def speech_to_text(url: str) -> str:
         'extractaudio': True,
         'audioformat': 'mp3', # yt-dlp extracts to mp3 first
         'outtmpl': audio_filepath.rsplit('.', 1)[0] + '.%(ext)s', # Use the base name for the template
-        'quiet': False,
+        'quiet': False, # Setting it to True would suppress most messages, but might also hide useful progress information.
         'postprocessors': [{
             'key': 'FFmpegExtractAudio',
             'preferredcodec': 'wav',
@@ -62,13 +62,18 @@ def speech_to_text(url: str) -> str:
     try:
         if downloaded_file_path and os.path.exists(downloaded_file_path):
             print(f"Transcribing audio file: {downloaded_file_path}...")
-            client = OpenAI()
-            with open(downloaded_file_path, "rb") as audio_file_object:
-                transcription = client.audio.transcriptions.create(
-                    model="gpt-4o-transcribe", 
-                    file=audio_file_object
-                )
-                transcription_text = "Text Extracted from video: " + transcription.text
+            try:
+                client = OpenAI()
+                with open(downloaded_file_path, "rb") as audio_file_object:
+                    transcription = client.audio.transcriptions.create(
+                        model="gpt-4o-transcribe", 
+                        file=audio_file_object
+                    )
+                    transcription_text = "Text Extracted from video: " + transcription.text
+            except Exception as e:
+                print(f"An error occurred with OpenAI API call, make sure you configure API in your environment")
+                transcription_text = f"Error in API Call: {e}. "
+
         else:
              transcription_text = "Error: Audio file not found after download attempt."
 
