@@ -8,6 +8,9 @@
 中文｜<a href="https://github.com/Talen-520/StockAgent/blob/main/README.md">English</a>
 
 **StockAgent 是一个开源的AI工具，通过向开源模型提供工具实现股票市场洞察、新闻摘要和数据分析、帮助用户快速理解市场趋势和公司新闻。**
+
+![demo](https://github.com/user-attachments/assets/71033cd9-359b-454f-88f6-454a58f5e555)
+
 ### 工具  
 - [Ollama](https://ollama.com/) - 本地AI模型运行环境
 
@@ -59,6 +62,18 @@ Here's a concise analysis of the key trends and implications from the provided n
 
 --- 
 ### **1. AI Data Center ...
+```
+## BiliBili 与 油管视频总结
+
+启用视频总结功能，你需要OpenAI API Key 和安装ffmpeg
+
+MacOS/Linux 
+```bash
+export OPENAI_API_KEY="your_api_key_here"
+```
+Windows
+```bash
+setx OPENAI_API_KEY "your_api_key_here"
 ```
 
 欢迎添加你自己的自定义工具！
