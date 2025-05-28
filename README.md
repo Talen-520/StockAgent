@@ -8,6 +8,9 @@ English | <a href="https://github.com/Talen-520/StockAgent/blob/main/README_CN.m
 
 **StockAgent is an intelligent AI-powered tool that provides real-time stock market insights, news summaries, and data analysis. Leveraging advanced AI and multiple financial APIs, it helps users quickly understand market trends and company news.**
 
+![demo](https://github.com/user-attachments/assets/71033cd9-359b-454f-88f6-454a58f5e555)
+
+
 ### Tools 
 - [Ollama](https://ollama.com/) - Local AI model runner
 
