@@ -69,7 +69,7 @@ available_functions = {
 class StockChatAssistant:
     def __init__(self):
         self.client = ollama.Client()
-        self.model_name = 'qwen2.5'
+        self.model_name = 'qwen3'
         self.messages = [{'role': 'system', 'content': system_prompt}]
     
     def clear_conversation(self):
@@ -200,7 +200,7 @@ def main():
 
     st.markdown(
     """
-    **You must run Ollama and install `qwen2.5` to use this chat.**
+    **You must run Ollama and install `qwen3` to use this chat.**
 
     **Commands Available:**  
     - `clear` - clear chat history  
