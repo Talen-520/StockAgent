@@ -1,8 +1,6 @@
 # StockAgent 
 
-[![support-version](https://img.shields.io/pypi/pyversions/coredumpy)](https://img.shields.io/badge/https%3A%2F%2Fgithub.com%2FTalen-520%2FStockAgent
-)
-[![Download](https://img.shields.io/github/downloads/Talen-520/StockAgent/total)](https://img.shields.io/github/downloads/Talen-520/StockAgent/total)
+![support-version](https://img.shields.io/badge/python-3.9%2B-blue.svg)
 
 English | <a href="https://github.com/Talen-520/StockAgent/blob/main/README_CN.md">中文</a>
 
